@@ -1,6 +1,6 @@
 
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import auth from '../../firebase.init'
 import './Login.css'
@@ -9,13 +9,16 @@ const Login = () => {
     const [email,setEmail] = useState('')
     const [password,setPass]= useState('')
     // const [eror,setError]= useState('')
-    
+
     const [
         signInWithEmailAndPassword,
         user,
         loading,
         error
       ] = useSignInWithEmailAndPassword(auth);
+      const navigate = useNavigate()
+      const location = useLocation()
+      const from = location.state?.from?.pathname || '/shop'
     const handleEmailBlur = e =>{
         setEmail(e.target.value)
     }
@@ -25,6 +28,10 @@ const Login = () => {
     const handleUserSubmit = e=>{
         e.preventDefault()
         signInWithEmailAndPassword(email,password)
+    }
+    if(user){
+        navigate(from,{replace:true})
+
     }
 
     return (
@@ -43,7 +50,10 @@ const Login = () => {
                     </div>
                     <input className='form-submit' type="submit" />
                 </form>
-                <p>{error?.message}</p>
+                <p style={{color:'red'}}>{error?.message}</p>
+                {
+                    loading && <p>Loading...</p>
+                }
                 <p className='form-link'>
                     New to Ema-john? <Link to='/signup'>Create an account</Link>
                 </p>
